@@ -10,14 +10,14 @@ Because Tracktr is built directly upon the Traccar engine, it inherits:
 * **Core Functionality:** Reliable real-time tracking, geofencing logic, and foundational reporting.
 
 **What Tracktr adds:**
-* A completely redesigned, intuitive web dashboard. **(Please note: The custom frontend source code resides in a separate repository: [`tracktr-web`](https://github.com/reneellup-consulting/tracktr-web)**
+* A completely redesigned, intuitive web dashboard. **(Please note: The custom frontend source code resides in a separate repository: [tracktr-web](https://github.com/reneellup-consulting/tracktr-web)**
 * Dedicated, branded mobile applications for Android and iOS.
 * Extended enterprise features and custom integrations not found in the base Traccar repository.
 
 ## Features
 
 * **Real-time GPS Tracking:** Monitor your fleet, assets, or personal devices in real-time with high accuracy.
-* **Modern Web UI:** A completely redesigned, intuitive web dashboard for managing devices, geofences, and reports. *Note: The UI codebase is located in the separate [`tracktr-web`](https://github.com/reneellup-consulting/tracktr-web) repository.*
+* **Modern Web UI:** A completely redesigned, intuitive web dashboard for managing devices, geofences, and reports. *Note: The UI codebase is located in the separate [tracktr-web](https://github.com/reneellup-consulting/tracktr-web) repository.*
 * **Geofencing & Alerts:** Create complex polygon or circular geofences and receive instant notifications (via Email, SMS, Telegram, Firebase, Web Push, etc.) for events like entering/exiting zones, overspeeding, or device disconnection.
 * **Comprehensive Reporting:** Generate detailed reports for trips, stops, route history, and summary statistics, with export options to CSV, GPX, and KML formats.
 * **Event Forwarding:** Seamlessly integrate with external systems by forwarding real-time position and event data via JSON, Kafka, or custom webhooks.
@@ -36,7 +36,7 @@ Tracktr maintains the reliable technology stack of its upstream source for the b
 ### Prerequisites
 * Java Development Kit (JDK) 11 or higher
 * A supported database (e.g., MySQL, PostgreSQL, H2 for testing)
-* The frontend repository (`tracktr-web`) set up and running for UI access.
+* The frontend repository (tracktr-web) set up and running for UI access.
 
 ### Building the Project
 Tracktr uses the Gradle build system. To compile the project and build the executable JAR, run the following command from the root directory:
