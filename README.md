@@ -29,7 +29,7 @@ Tracktr maintains the reliable technology stack of its upstream source for the b
 * **Networking:** Netty framework
 * **Build System:** Gradle
 * **Database:** Supports multiple relational databases via an abstraction layer (MySQL, PostgreSQL, H2).
-* **Frontend:** Maintained independently in `[tracktr-web](https://github.com/reneellup-consulting/tracktr-web)`.
+* **Frontend:** Maintained independently in [tracktr-web](https://github.com/reneellup-consulting/tracktr-web).
 
 ## Getting Started
 
