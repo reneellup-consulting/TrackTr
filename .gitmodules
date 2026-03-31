@@ -1,0 +1,5 @@
+[submodule "tracktr-web"]
+	path = tracktr-web
+	url = https://github.com/rlllup0084/tracktr-web.git
+    branch = master
+    ignore = all

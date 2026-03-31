@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+        logicalFilePath="changelog-5.5-0001">
+
+    <changeSet author="author" id="changelog-5.5-0001">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="rl_posshare"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="rl_posshares">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="active" type="boolean"/>
+            <column name="userId" type="INT" />
+            <column name="groupId" type="INT" />
+            <column name="deviceid" type="INT"/>
+            <column name="expireon" type="datetime"/>
+            <column name="deleteafterexpiration" type="boolean"/>
+            <column name="email" type="varchar(255)"/>
+            <column name="url" type="varchar(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="rl_posshares" baseColumnNames="userId" constraintName="fk_user_posshares_userId" referencedTableName="tc_users" referencedColumnNames="id" onDelete="CASCADE" />
+        <addForeignKeyConstraint baseTableName="rl_posshares" baseColumnNames="groupId" constraintName="fk_group_posshares_groupId" referencedTableName="tc_groups" referencedColumnNames="id" onDelete="CASCADE" />
+        <addForeignKeyConstraint baseTableName="rl_posshares" baseColumnNames="deviceid" constraintName="fk_device_posshares_deviceid" referencedTableName="tc_devices" referencedColumnNames="id" onDelete="CASCADE" />
+
+    </changeSet>
+
+</databaseChangeLog>

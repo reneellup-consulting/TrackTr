@@ -1,0 +1,16 @@
+[Unit]
+Description=tracktr
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/tracktr
+ExecStart=/opt/tracktr/jre/bin/java -jar tracker-server.jar conf/tracktr.xml
+SyslogIdentifier=tracktr
+SuccessExitStatus=143
+WatchdogSec=600
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

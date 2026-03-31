@@ -1,0 +1,151 @@
+name: Update Production Environment to Linux
+
+on:
+  workflow_dispatch:
+#  schedule:
+#    - cron: "0 0 * * 1" # At 00:00 every Monday
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Backup MySQL DB
+        uses: valerianpereira/backup-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }} # IP address of the server you wish to ssh into
+          username: ${{ secrets.SSH_USERNAME }} # User of the server you want to ssh into
+          passphrase: ${{ secrets.SSH_PASSPHRASE }} # Passphrase of the server you want to ssh into
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.DEPLOY_KEY }} # Private or public key GitHub deployment to the server
+          type: db
+          db_type: mysql
+          db_user: ${{ secrets.MYSQL_USER }}
+          db_pass: ${{ secrets.MYSQL_PASS }}
+          db_port: 3306
+          db_name: tracktr
+
+      - name: Push backups to target server via SCP
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: /home/runner/work/tracktr/tracktr
+          remote: /root
+          host: ${{ secrets.TARGET_IP }}
+          username: ${{ secrets.TARGET_USER }}
+          password: ${{ secrets.TARGET_PASS }}
+
+      - name: Set Directory to Remove
+        run: sudo chown -R $USER:$USER /home/runner/work/tracktr/tracktr
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11.0.13
+
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+        uses: actions/checkout@v2
+        with:
+          repository: rlllup0084/tracktr-web
+          token: ${{ secrets.ACCESS_TOKEN }}
+          path: tracktr-web/
+
+      - name: Fetch action
+        id: pl1
+        uses: Rishabh510/Path-lister-action@master
+        with:
+          path: "tracktr-web/"
+
+      - name: Output results
+        run: |
+          echo "Found ${{ steps.pl1.outputs.path_count }} file(s) with this extension:"
+          for i in ${{ steps.pl1.outputs.paths }}; do
+          echo $i
+          done
+
+      - name: Set chmod +x gradlew
+        run: chmod +x gradlew
+
+      - name: Build tracktr
+        run: ./gradlew build
+
+      - name: Setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Build tracktr-web
+        run: |
+          cd tracktr-web
+          npm install
+          CI=false npm run build
+
+      - name: Prepare installation directory and files
+        run: |
+          sudo apt install -y unzip makeself
+          wget https://github.com/ojdkbuild/contrib_jdk11u-ci/releases/download/jdk-11.0.13%2B8/jdk-11.0.13-ojdkbuild-linux-x64.zip
+          mkdir -p out/{conf,data,lib,logs,legacy,web,schema,templates}
+          cp target/tracker-server.jar out
+          cp target/lib/* out/lib
+          cp schema/* out/schema
+          cp -r templates/* out/templates
+          cp -r tracktr-web/build/* out/web
+          cp setup/default.xml out/conf
+          cp setup/tracktr.xml out/conf
+          chmod +x setup/setup.sh
+          cp setup/setup.sh out
+          cp setup/tracktr.service out
+          unzip -q -o jdk-*-linux-x64.zip
+          jlink --module-path jdk-*-linux-x64/jmods --add-modules java.se,jdk.charsets,jdk.crypto.ec --output out/jre
+          makeself --needroot --quiet --notemp out tracktr.run "tracktr" ./setup.sh
+
+      - name: Fetch action
+        id: pl2
+        uses: Rishabh510/Path-lister-action@master
+        with:
+          path: "/home/runner/work/tracktr/tracktr"
+          type: ".run"
+
+      - name: Output results
+        run: |
+          echo "Found ${{ steps.pl2.outputs.path_count }} file(s) with this extension:"
+          for i in ${{ steps.pl2.outputs.paths }}; do
+          echo $i
+          done
+
+      - name: Uninstall existing Tracktr services
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.TARGET_IP }}
+          username: ${{ secrets.TARGET_USER }}
+          password: ${{ secrets.TARGET_PASS }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            sudo systemctl stop tracktr
+            sudo systemctl disable tracktr
+            sudo rm /etc/systemd/system/tracktr.service
+            sudo systemctl daemon-reload
+            sudo rm -R /opt/tracktr
+            sudo rm tracktr.run
+
+      - name: Send tracktr.run to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TARGET_IP }}
+          username: ${{ secrets.TARGET_USER }}
+          password: ${{ secrets.TARGET_PASS }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "/github/workspace/tracktr.run"
+          target: "/root"
+          strip_components: 2
+
+      - name: Start Tracktr service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.TARGET_IP }}
+          username: ${{ secrets.TARGET_USER }}
+          password: ${{ secrets.TARGET_PASS }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            ./tracktr.run
+            service tracktr start

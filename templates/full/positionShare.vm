@@ -1,0 +1,19 @@
+#set($subject = "TrackTr Vehicle GPS Position Sharing")
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>TrackTr Vehicle GPS Position</h2>
+    <p>Dear Sir/Ma'am,</p>
+    <p>We are pleased to share with you the GPS positions of your requested vehicles.</p>
+
+    <p>To track the real-time movement of the vehicles and view their current positions, please click on the following link:</p>
+    <p><a href="$url">TrackTr Vehicle Tracking</a></p>
+
+    <p>Please note that the provided link will direct you to the TrackTr system, where you can explore the real-time positions of the shared vehicles.</p>
+
+    <p>Thank you for choosing GS Gavel Logistics Co., Inc. If you have any further questions or need assistance, please feel free to contact our support team.</p>
+
+    <p>Best regards,</p>
+    <p>The TrackTr Team</p>
+</body>
+</html>
